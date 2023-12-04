@@ -32,19 +32,34 @@ function App() {
   }, []);
 
   const HandleSurah = () => {
+    const [isLoadingSurah, setIsLoadingSurah] = useState(true);
+    useEffect(() => {
+      // Set isLoading to false when data is loaded
+      setIsLoadingSurah(false);
+    }, []);
     return (
       <ScrollView>
         <View>
-          {data?.ayat?.map((item: any) => {
-            return (
-              <View style={styles.contentBody} key={item.nomor}>
-                <Text style={{fontWeight: 'bold', color: 'black'}}>
-                  {item.ar}
-                </Text>
-                <Text style={{fontSize: 16}} >{item.nomor} {item.idn}</Text>
-              </View>
-            );
-          })}
+          {isLoadingSurah ? (
+            <Text style={{ textAlign: 'center' , fontWeight: 'bold' , color: 'black', marginTop: 50}}>Loading...</Text>
+          ) : (
+            <View>
+              {data?.ayat?.map((item: any) => {
+                return (
+                  <TouchableOpacity
+                    onPress={() => getHandlePerSurat(item.nomor)}
+                    key={item.nomor}>
+                    <View style={styles.contentBody}>
+                      <Text style={{fontWeight: 'bold', color: 'black'}}>
+                        {item.ar}
+                      </Text>
+                      <Text style={{fontSize: 16}} >{item.nomor} {item.idn}</Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          )}
         </View>
       </ScrollView>
     );
@@ -57,26 +72,35 @@ function App() {
       .then(data => setData(data));
   };
   const HandleListSurah = () => {
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+      // Set isLoading to false when data is loaded
+      setIsLoading(false);
+    }, []);
     return (
       <ScrollView>
         <View>
-          {datas?.map((data: any) => {
-            return (
-              <View style={styles.contentBody} key={data.nomor}>
-                <TouchableOpacity
-                  onPress={() => {
-                    setIsOpen(true);
-                    getHandlePerSurat(data.nomor);
-                  }}>
-                  <Text style={{fontWeight: 'bold', color: 'black'}}>
-                    {data.nama}
-                  </Text>
-                  <Text>{data.nama_latin}</Text>
-                  <Text>{data.arti}</Text>
-                </TouchableOpacity>
-              </View>
-            );
-          })}
+        {isLoading ? (
+          <Text style={{ textAlign: 'center' , fontWeight: 'bold' , color: 'black', marginTop: 50}}>Loading...</Text>
+        ) : (
+          datas?.map((data: any) => (
+            <View style={styles.contentBody} key={data.nomor}>
+              <TouchableOpacity
+                onPress={() => {
+                  setIsOpen(true);
+                  getHandlePerSurat(data.nomor);
+                }}
+              >
+                <Text style={{ fontWeight: 'bold', color: 'black' }}>
+                  {data.nama}
+                </Text>
+                <Text>{data.nama_latin}</Text>
+                <Text>{data.arti}</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
         </View>
       </ScrollView>
     );
@@ -94,7 +118,7 @@ function App() {
 
   return (
     <NavigationContainer>
-      <Tab.Navigator>
+      <Tab.Navigator >
         <Tab.Screen
           name={isOpen ? `Surat ${data?.nama_latin}` : 'Daftar Surat'}
           component={isOpen ? HandleSurah : HandleListSurah}
